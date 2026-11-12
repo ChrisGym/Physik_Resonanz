@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resonanz & Erzwungene Schwingungen – Physik 12. Klasse</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="badge-group">
+        <span class="badge">Physik Oberstufe · Jahrgangsstufe 12</span>
+        <span class="badge badge-accent">Schwingungslehre</span>
+      </div>
+      <h1>Erzwungene Schwingungen &amp; das <span class="gradient-text">Resonanzphänomen</span></h1>
+      <p class="subtitle">
+        Interaktives Physik-Labor zur Untersuchung von Eigenfrequenz, Erregerfrequenz, Dämpfung und Phasenverschiebung.
+      </p>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- KURZE ERKLÄRUNG / GRUNDLAGEN -->
+    <section class="intro-grid" aria-label="Grundbegriffe">
+      <article class="concept-card">
+        <div class="card-icon icon-blue">f₀</div>
+        <h3>1. Eigenfrequenz <span class="math">f₀</span></h3>
+        <p>
+          Jedes schwingfähige System (Oszillator) besitzt eine natürliche Frequenz, mit der es nach einmaligem Anstoßen frei schwingt. Beim Federpendel gilt:
+        </p>
+        <div class="formula-pill">
+          f₀ = <span class="frac"><span class="num">1</span><span class="den">2π</span></span> · √(<span class="frac"><span class="num">D</span><span class="den">m</span></span>)
+        </div>
+      </article>
+
+      <article class="concept-card">
+        <div class="card-icon icon-purple">f<sub>E</sub></div>
+        <h3>2. Erzwungene Schwingung</h3>
+        <p>
+          Wird dem Oszillator von außen periodisch Energie mit der <strong>Erregerfrequenz <span class="math">f<sub>E</sub></span></strong> zugeführt, zwingt der Erreger dem System nach kurzer Einschwingzeit seine Frequenz <span class="math">f<sub>E</sub></span> auf.
+        </p>
+        <div class="formula-pill">
+          y<sub>E</sub>(t) = ŷ<sub>E</sub> · sin(2π · f<sub>E</sub> · t)
+        </div>
+      </article>
+
+      <article class="concept-card highlight-card">
+        <div class="card-icon icon-amber">⚡</div>
+        <h3>3. Resonanz (<span class="math">f<sub>E</sub> ≈ f₀</span>)</h3>
+        <p>
+          Stimmt die Erregerfrequenz nahezu mit der Eigenfrequenz überein, erfolgt die Energiezufuhr <strong>immer im richtigen Takt</strong> (Phasenverschiebung <span class="math">Δφ = π/2 = 90°</span>). Die Amplitude wächst drastisch an!
+        </p>
+        <div class="formula-pill warning-pill">
+          Bei Dämpfung b → 0 droht die <strong>Resonanzkatastrophe</strong>!
+        </div>
+      </article>
+    </section>
+
+    <!-- INTERAKTIVES LABOR -->
+    <section class="lab-section" id="labor">
+      <div class="section-header">
+        <div>
+          <h2>Interaktives Resonanz-Labor</h2>
+          <p>Verändere die Erregerfrequenz <span class="math">f<sub>E</sub></span> und beobachte Federpendel, Resonanzkurve und Phasenverschiebung in Echtzeit.</p>
+        </div>
+        <div class="preset-bar" role="group" aria-label="Schnellauswahl-Szenarien">
+          <button class="btn-preset" data-preset="sub">Unterkritisch (f<sub>E</sub> ≪ f₀)</button>
+          <button class="btn-preset active" data-preset="res">🎯 Resonanzfall (f<sub>E</sub> = f₀)</button>
+          <button class="btn-preset" data-preset="super">Überkritisch (f<sub>E</sub> ≫ f₀)</button>
+          <button class="btn-preset btn-danger" data-preset="catastrophe">⚠️ Resonanzkatastrophe</button>
+        </div>
+      </div>
+
+      <div class="lab-grid">
+        <!-- LINKE SPALTE: PENDEL-ANIMATION & STEUERUNG -->
+        <div class="panel sim-panel">
+          <div class="panel-title-row">
+            <h3>Getriebenes Federpendel (Echtzeit)</h3>
+            <div class="sim-controls-top">
+              <button id="btnPlayPause" class="btn-icon" title="Simulation pausieren/fortsetzen">⏸ Pause</button>
+              <button id="btnSound" class="btn-icon" title="Akustischen Resonanzton ein-/ausschalten">🔇 Ton aus</button>
+            </div>
+          </div>
+
+          <div class="canvas-wrapper pendulum-wrapper">
+            <canvas id="pendulumCanvas" width="460" height="390"></canvas>
+            <div class="legend-overlay">
+              <span class="legend-item"><span class="dot dot-driver"></span> Erreger y<sub>E</sub>(t)</span>
+              <span class="legend-item"><span class="dot dot-mass"></span> Oszillator y(t)</span>
+              <span class="legend-item"><span class="dot dot-force"></span> Kraft / Geschwindigkeit</span>
+            </div>
+          </div>
+
+          <!-- ZEITDIAGRAMM y(t) und y_E(t) -->
+          <div class="sub-panel">
+            <div class="sub-panel-header">
+              <span>Zeitverlauf <span class="math">y(t)</span> &amp; <span class="math">y<sub>E</sub>(t)</span> (Phasenvergleich)</span>
+              <span id="phaseStateBadge" class="state-badge">90° Phasenverschiebung (Optimaler Antrieb)</span>
+            </div>
+            <canvas id="timeCanvas" width="460" height="125"></canvas>
+          </div>
+        </div>
+
+        <!-- RECHTE SPALTE: REGLER + RESONANZKURVE + PHASENGANG -->
+        <div class="panel charts-panel">
+          <!-- PARAMETER-STEUERUNG -->
+          <div class="controls-box">
+            <div class="control-row">
+              <div class="control-label">
+                <label for="sliderFe">Erregerfrequenz <span class="math">f<sub>E</sub></span></label>
+                <span class="control-value highlight-purple" id="valFe">1.00 Hz</span>
+              </div>
+              <input type="range" id="sliderFe" min="0.10" max="2.50" step="0.01" value="1.00" />
+              <div class="range-ticks">
+                <span>0.1 Hz</span>
+                <span id="markerF0Tick" class="tick-f0">▲ f₀ = 1.00 Hz</span>
+                <span>2.5 Hz</span>
+              </div>
+            </div>
+
+            <div class="control-row">
+              <div class="control-label">
+                <label for="sliderF0">Eigenfrequenz <span class="math">f₀</span> (Federhärte / Masse)</label>
+                <span class="control-value highlight-blue" id="valF0">1.00 Hz</span>
+              </div>
+              <input type="range" id="sliderF0" min="0.50" max="1.80" step="0.05" value="1.00" />
+            </div>
+
+            <div class="control-row">
+              <div class="control-label">
+                <label for="sliderDamping">Dämpfungsgrad <span class="math">D<sub>L</sub></span> (Reibung <span class="math">b</span>)</label>
+                <span class="control-value highlight-amber" id="valDamping">0.12 (schwach gedämpft)</span>
+              </div>
+              <input type="range" id="sliderDamping" min="0.02" max="0.75" step="0.01" value="0.12" />
+            </div>
+
+            <!-- LIVE MESSWERTE -->
+            <div class="metrics-bar">
+              <div class="metric-item">
+                <span class="metric-label">Frequenzverhältnis η = f<sub>E</sub> / f₀</span>
+                <span class="metric-num" id="metricRatio">1.00</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Vergrößerungsfaktor A / ŷ<sub>E</sub></span>
+                <span class="metric-num highlight-amber" id="metricAmp">4.17×</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Phasenverschiebung Δφ</span>
+                <span class="metric-num" id="metricPhase">90.0° (0.50 π)</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Resonanzmaximum f<sub>R</sub></span>
+                <span class="metric-num" id="metricFr">0.99 Hz</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- DIAGRAMM 1: RESONANZKURVE (AMPLITUDENGANG) -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <h4>Amplitudengang (Resonanzkurve) <span class="math">A(f<sub>E</sub>)</span></h4>
+              <span class="chart-hint">Klicke oder ziehe im Diagramm, um <span class="math">f<sub>E</sub></span> zu ändern</span>
+            </div>
+            <canvas id="ampChartCanvas" width="540" height="205"></canvas>
+          </div>
+
+          <!-- DIAGRAMM 2: PHASENGANG -->
+          <div class="chart-card">
+            <div class="chart-header">
+              <h4>Phasengang <span class="math">Δφ(f<sub>E</sub>)</span> zwischen Erreger und Oszillator</h4>
+              <span class="chart-hint">Bei <span class="math">f<sub>E</sub> = f₀</span> gilt exakt <span class="math">Δφ = 90° (π/2)</span></span>
+            </div>
+            <canvas id="phaseChartCanvas" width="540" height="165"></canvas>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PHYSIKALISCHE ERKLÄRUNG DER DREI BEREICHE -->
+    <section class="theory-section">
+      <h2>Physikalische Analyse der drei Frequenzbereiche</h2>
+      <p class="section-lead">
+        Warum reagiert ein Oszillator je nach Erregerfrequenz so unterschiedlich? Der Schlüssel liegt in der <strong>Phasenverschiebung <span class="math">Δφ</span></strong> zwischen Erregerauslenkung und Oszillatorauslenkung:
+      </p>
+
+      <div class="regimes-grid">
+        <div class="regime-card" id="regimeCardSub">
+          <div class="regime-header">
+            <span class="regime-tag">Fall 1 · f<sub>E</sub> ≪ f₀</span>
+            <h4>Quasistatischer Grenzfall</h4>
+          </div>
+          <ul class="regime-list">
+            <li><strong>Phase:</strong> <span class="math">Δφ ≈ 0°</span> (gleichphasig)</li>
+            <li><strong>Amplitude:</strong> <span class="math">A ≈ ŷ<sub>E</sub></span> (Vergrößerung ≈ 1)</li>
+            <li><strong>Anschauung:</strong> Der Erreger bewegt sich so langsam, dass die Masse der Aufhängung einfach ohne Verzögerung folgt – als hinge sie an einer starren Stange.</li>
+          </ul>
+        </div>
+
+        <div class="regime-card active-regime" id="regimeCardRes">
+          <div class="regime-header">
+            <span class="regime-tag tag-res">Fall 2 · f<sub>E</sub> ≈ f₀</span>
+            <h4>Resonanzbereich</h4>
+          </div>
+          <ul class="regime-list">
+            <li><strong>Phase:</strong> <span class="math">Δφ = 90° (π/2)</span> bei <span class="math">f<sub>E</sub> = f₀</span></li>
+            <li><strong>Amplitude:</strong> Maximal (<span class="math">A<sub>max</sub> ∝ 1/b</span>)</li>
+            <li><strong>Anschauung:</strong> Der Oszillator läuft dem Erreger um eine Viertelperiode hinterher. Dadurch zieht der Erreger <em>genau dann nach oben</em>, wenn die Masse mit maximaler Geschwindigkeit durch die Ruhelage nach oben saust!</li>
+          </ul>
+        </div>
+
+        <div class="regime-card" id="regimeCardSuper">
+          <div class="regime-header">
+            <span class="regime-tag">Fall 3 · f<sub>E</sub> ≫ f₀</span>
+            <h4>Trägheitsbestimmter Grenzfall</h4>
+          </div>
+          <ul class="regime-list">
+            <li><strong>Phase:</strong> <span class="math">Δφ ≈ 180° (π)</span> (gegenphasig)</li>
+            <li><strong>Amplitude:</strong> <span class="math">A → 0</span> (Blockade durch Trägheit)</li>
+            <li><strong>Anschauung:</strong> Der Erreger wackelt extrem schnell hin und her. Wegen ihrer <strong>Massenträgheit</strong> kann die schwere Kugel den schnellen Richtungswechseln nicht mehr folgen und bleibt fast in Ruhe.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- FORMELKASTEN FÜR DIE OBERSTUFE -->
+      <div class="math-box">
+        <div class="math-box-content">
+          <h3>Mathematische Beschreibung (Leistungskurs / 12. Klasse)</h3>
+          <p>
+            Aus der Bewegungsgleichung des gedämpften, harmonisch angetriebenen Oszillators
+            <code>m·ÿ + b·ẏ + D·y = F̂<sub>E</sub>·sin(ω<sub>E</sub>·t)</code>
+            folgt nach dem Einschwingvorgang für die stationäre Amplitude <span class="math">A(ω<sub>E</sub>)</span> und die Phasenverschiebung <span class="math">Δφ(ω<sub>E</sub>)</span>:
+          </p>
+          <div class="equations-row">
+            <div class="eq-card">
+              <span class="eq-title">Amplitudenfunktion (Resonanzformel)</span>
+              <div class="eq-display">
+                A(f<sub>E</sub>) = <span class="frac"><span class="num">ŷ<sub>E</sub> · f₀²</span><span class="den">√( (f₀² − f<sub>E</sub>²)² + (2·D<sub>L</sub>·f₀·f<sub>E</sub>)² )</span></span>
+              </div>
+              <small>mit Lehrschem Dämpfungsmaß D<sub>L</sub> = b / (2·m·ω₀)</small>
+            </div>
+            <div class="eq-card">
+              <span class="eq-title">Phasenverschiebung</span>
+              <div class="eq-display">
+                tan(Δφ) = <span class="frac"><span class="num">2 · D<sub>L</sub> · f₀ · f<sub>E</sub></span><span class="den">f₀² − f<sub>E</sub>²</span></span>
+              </div>
+              <small>Für f<sub>E</sub> → f₀ strebt der Nenner gegen 0 ⇒ Δφ = 90°</small>
+            </div>
+            <div class="eq-card">
+              <span class="eq-title">Resonanzfrequenz f<sub>R</sub></span>
+              <div class="eq-display">
+                f<sub>R</sub> = f₀ · √(1 − 2·D<sub>L</sub>²)
+              </div>
+              <small>Mit steigender Dämpfung verschiebt sich das Maximum leicht nach links (<span class="math">f<sub>R</sub> &lt; f₀</span>)!</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ZWEITES INTERAKTIVES EXPERIMENT: BARTONS PENDEL -->
+    <section class="barton-section">
+      <div class="barton-grid">
+        <div class="barton-info">
+          <span class="badge badge-accent">Klassisches Vorführexperiment</span>
+          <h2>Bartons Pendel: Frequenzselektion live erleben</h2>
+          <p>
+            An einer gemeinsamen gespannten Schnur hängen fünf Fadenpendel unterschiedlicher Länge <span class="math">L</span>. Da für das Fadenpendel
+            <strong>f₀ = <span class="frac"><span class="num">1</span><span class="den">2π</span></span>·√(g/L)</strong> gilt, hat jedes Pendel eine andere Eigenfrequenz.
+          </p>
+          <p>
+            Wähle ein Erreger-Pendel (oder stelle die Anregungsfrequenz direkt ein) und beobachte, <strong>welches Pendel in Resonanz gerät</strong>!
+          </p>
+          <div class="barton-buttons" role="group" aria-label="Barton-Pendel anregen">
+            <button class="btn-barton" data-freq="1.35">Pendel 1 anregen (kurz · 1.35 Hz)</button>
+            <button class="btn-barton" data-freq="1.12">Pendel 2 anregen (1.12 Hz)</button>
+            <button class="btn-barton active" data-freq="0.95">Pendel 3 anregen (mittel · 0.95 Hz)</button>
+            <button class="btn-barton" data-freq="0.82">Pendel 4 anregen (0.82 Hz)</button>
+            <button class="btn-barton" data-freq="0.72">Pendel 5 anregen (lang · 0.72 Hz)</button>
+          </div>
+        </div>
+        <div class="barton-canvas-wrap">
+          <canvas id="bartonCanvas" width="520" height="300"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <!-- ALLTAGSBEISPIELE: NUTZEN VS. GEFAHR -->
+    <section class="examples-section">
+      <h2>Resonanz in Natur, Technik &amp; Alltag</h2>
+      <div class="examples-grid">
+        <article class="example-card">
+          <div class="example-badge good">Erwünscht · Akustik</div>
+          <h3>🎸 Musikinstrumente &amp; Stimmgabel</h3>
+          <p>
+            Saiten allein bewegen kaum Luft. Erst der <strong>Resonanzkörper</strong> einer Gitarre oder Geige wird zu erzwungenen Schwingungen angeregt und strahlt den Schall hörbar ab.
+          </p>
+        </article>
+
+        <article class="example-card">
+          <div class="example-badge good">Erwünscht · Medizin &amp; Technik</div>
+          <h3>🧲 MRT &amp; Schwingkreise</h3>
+          <p>
+            Bei der Magnetresonanztomographie (MRT) werden Wasserstoffkerne im Körper exakt mit ihrer Larmorfrequenz durch Hochfrequenzimpulse resonant angeregt. Auch jedes Radio- und WLAN-Empfangsteil nutzt elektromagnetische Resonanz zur Frequenzwahl.
+          </p>
+        </article>
+
+        <article class="example-card">
+          <div class="example-badge bad">Gefährlich · Bauwesen</div>
+          <h3>🌉 Brücken &amp; Wolkenkratzer</h3>
+          <p>
+            Marschierende Soldaten im Gleichschritt (Broughton Suspension Bridge 1831) oder Fußgängerströme (Millennium Bridge London 2000) können Brücken in ihrer Eigenfrequenz anregen. Deshalb sind heute <strong>Schwingungstilger</strong> (z. B. im Taipei 101) verbaut.
+          </p>
+        </article>
+
+        <article class="example-card">
+          <div class="example-badge bad">Alltag · Mechanik</div>
+          <h3>🧺 Schleudernde Waschmaschine</h3>
+          <p>
+            Beim Hochlaufen der Trommel durchläuft die Drehzahl kurzzeitig die Eigenfrequenz der aufgehängten Trommel: Die Maschine rüttelt stark. Bei hoher Schleuderdrehzahl (<span class="math">f<sub>E</sub> ≫ f₀</span>) läuft sie dagegen wieder überraschend ruhig!
+          </p>
+        </article>
+      </div>
+    </section>
+
+    <!-- KURZES WISSENS-QUIZ FÜR DEN UNTERRICHT -->
+    <section class="quiz-section">
+      <div class="quiz-header">
+        <div>
+          <span class="badge">Unterrichts-Check · 4 Fragen</span>
+          <h2>Verständnis-Quiz für die 12. Klasse</h2>
+        </div>
+        <button id="btnResetQuiz" class="btn-secondary">Quiz zurücksetzen</button>
+      </div>
+
+      <div class="quiz-grid" id="quizContainer">
+        <!-- Wird dynamisch per JS gerendert -->
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Erstellt für den Physik-Anschauungsunterricht der 12. Jahrgangsstufe · Interaktive Simulationen mit HTML5 Canvas</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
