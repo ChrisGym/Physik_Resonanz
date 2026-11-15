@@ -109,6 +109,12 @@ h1 {
   font-weight: 600;
 }
 
+sub {
+  font-size: 0.75em;
+  line-height: 0;
+  vertical-align: sub;
+}
+
 /* INTRO CARDS */
 .intro-grid {
   display: grid;
