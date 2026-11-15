@@ -892,6 +892,24 @@ document.addEventListener('DOMContentLoaded', () => {
   const quizContainer = document.getElementById('quizContainer');
   const btnResetQuiz = document.getElementById('btnResetQuiz');
 
+  function setQuizText(element, text) {
+    element.replaceChildren();
+    text.split('f_E').forEach((part, index) => {
+      if (index > 0) {
+        const formula = document.createElement('span');
+        formula.className = 'math';
+        formula.append('f');
+
+        const subscript = document.createElement('sub');
+        subscript.textContent = 'E';
+        formula.appendChild(subscript);
+        element.appendChild(formula);
+      }
+
+      element.appendChild(document.createTextNode(part));
+    });
+  }
+
   function renderQuiz() {
     quizContainer.innerHTML = '';
     quizQuestions.forEach((item) => {
@@ -900,7 +918,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       const title = document.createElement('div');
       title.className = 'quiz-q';
-      title.textContent = item.q;
+      setQuizText(title, item.q);
       card.appendChild(title);
 
       const optsWrap = document.createElement('div');
@@ -912,7 +930,7 @@ document.addEventListener('DOMContentLoaded', () => {
       item.options.forEach((optText, optIndex) => {
         const btn = document.createElement('button');
         btn.className = 'quiz-option';
-        btn.textContent = optText;
+        setQuizText(btn, optText);
 
         btn.addEventListener('click', () => {
           const allBtns = optsWrap.querySelectorAll('.quiz-option');
@@ -920,11 +938,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
           if (optIndex === item.correct) {
             btn.classList.add('correct');
-            feedback.textContent = '✅ ' + item.explanation;
+            setQuizText(feedback, '✅ ' + item.explanation);
           } else {
             btn.classList.add('wrong');
             allBtns[item.correct].classList.add('correct');
-            feedback.textContent = '❌ Nicht ganz. ' + item.explanation;
+            setQuizText(feedback, '❌ Nicht ganz. ' + item.explanation);
           }
           feedback.classList.add('visible');
         });
